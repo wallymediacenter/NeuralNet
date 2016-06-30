@@ -11,6 +11,8 @@ public class NeuNet{
   public double z2;
   public double output;
 
+  public double c;
+
   /*constructor*/
   public NeuNet(){
 
@@ -39,7 +41,6 @@ public class NeuNet{
     z2 = 0;
     output = 0;
   }
-
 
   /*Methods*/
   //return the estimated value
@@ -72,6 +73,12 @@ public class NeuNet{
   //activation function || Sigmoid function
   public static double s(double x){
     return (1/(1 + Math.exp(-x)));
+  }
+
+  //cost function cost = 1/2 ( realOutput - output(Guess) )^2
+  public double cost(double realOutput){
+    c = 0.5*Math.pow( (realOutput - output), 2 );
+    return c;
   }
 
 }
