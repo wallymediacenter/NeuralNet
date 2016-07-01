@@ -4,12 +4,17 @@ public class NeuNet{
   public double[] input;
   public double[][] w1;
 
+  public double[][] deltaW1;
+
   public double[] z1;
   public double[] a1;
   public double[] w2;
 
+  public double[] deltaW2;
+
   public double z2;
   public double output;
+  public double output0;
 
   public double c;
 
@@ -22,6 +27,7 @@ public class NeuNet{
     /*Hidden layer*/
     //initialize weights
     w1 = new double[2][3]; // 2 x 3
+    deltaW1 = new double[2][3]; // 2 x 3
     //Weights are asignned randomly
     for(int i = 0; i < 2; i++){
       for(int j = 0; j < 2; j++){
@@ -35,6 +41,7 @@ public class NeuNet{
     /*Output layer*/
     //initialize weights
     w2 = new double[3]; // 3 x 1
+    deltaW2 = new double[3]; // 3 x 1
     for(int i = 0; i < 3; i++){
       w2[i] = Math.random();
     }
@@ -70,13 +77,41 @@ public class NeuNet{
     return output;
   }
 
+  public void back(){
+
+    double alpha = -(output0 - output)*sPrime(z2);
+
+    //d cost / d w2
+    for(int i = 0; i < 3; i++){
+      deltaW2[i] = alpha*a1[i];
+    }
+
+    //d cost / d w2
+    for(int i = 0; i < 2; i++){
+      for(int j = 0; j < 3; j++){
+        deltaW1[i][j] = alpha*sPrime(z1[j])*w2[j]*input[i];
+        w1[i][j] -= deltaW1[i][j]; //Update weights
+      }
+    }
+
+    for(int i = 0; i < 3; i++){
+      w2[i] -= deltaW2[i]; //Update weights
+    }
+
+  }
+
   //activation function || Sigmoid function
   public static double s(double x){
     return (1/(1 + Math.exp(-x)));
   }
 
+  public static double sPrime(double x){
+    return (Math.exp(-x) / ( Math.pow( (1 + Math.exp(-x)), 2 ) ) );
+  }
+
   //cost function cost = 1/2 ( realOutput - output(Guess) )^2
   public double cost(double realOutput){
+    output0 = realOutput;
     c = 0.5*Math.pow( (realOutput - output), 2 );
     return c;
   }
