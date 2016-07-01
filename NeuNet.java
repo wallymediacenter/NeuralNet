@@ -1,3 +1,4 @@
+
 public class NeuNet{
 
   //fields
@@ -21,6 +22,11 @@ public class NeuNet{
   public double output0;
 
   public double c;
+
+  //COLOR STUFF
+  public static final String green = "\u001B[32m";
+  public static final String blue = "\u001B[34m";
+  public static final String cyan = "\u001B[36m";
 
   /*constructor*/
   public NeuNet(){
@@ -96,28 +102,28 @@ public class NeuNet{
     for(int i = 0; i < 2; i++){
       for(int j = 0; j < 3; j++){
         deltaW1[i][j] = alpha*sPrime(z1[j])*w2[j]*input[i];
-        w1[i][j] -= deltaW1[i][j]; //Update weights
+        w1[i][j] -= 0.1*deltaW1[i][j]; //Update weights
       }
     }
 
     for(int i = 0; i < 3; i++){
-      w2[i] -= deltaW2[i]; //Update weights
+      w2[i] -= 0.1*deltaW2[i]; //Update weights
     }
 
     //Print deltaW1 and deltaW2
-    System.out.println("------------- deltaW1 -------------");
+    System.out.println(blue + "------------- deltaW1 -------------");
     for(int i=0; i < 2; i++){
       for(int j=0; j < 3; j++){
-        System.out.print(deltaW1[i][j] + " ");
+        System.out.print(blue + deltaW1[i][j] + " ");
       }
       System.out.println();
     }
 
-    System.out.println("------------- deltaW2 -------------");
+    System.out.println(cyan + "------------- deltaW2 -------------");
     for(int i = 0; i<3; i++){
-      System.out.println(deltaW2[i]);
+      System.out.println(cyan + deltaW2[i]);
     }
-    System.out.println("----------------------------");
+    System.out.println(blue +"----------------------------");
 
   }
 
