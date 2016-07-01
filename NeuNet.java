@@ -42,7 +42,7 @@ public class NeuNet{
     //Weights are asignned randomly
     for(int i = 0; i < 2; i++){
       for(int j = 0; j < 2; j++){
-        w1[i][j] = Math.random();
+        w1[i][j] = 0.5*Math.random();
       }
     }
 
@@ -55,7 +55,7 @@ public class NeuNet{
     deltaW2 = new double[3]; // 3 x 1
     gradientW2 = new double[3]; // 3 x 1
     for(int i = 0; i < 3; i++){
-      w2[i] = Math.random();
+      w2[i] = 0.5*Math.random();
     }
     z2 = 0;
     output = 0;
@@ -102,12 +102,12 @@ public class NeuNet{
     for(int i = 0; i < 2; i++){
       for(int j = 0; j < 3; j++){
         deltaW1[i][j] = alpha*sPrime(z1[j])*w2[j]*input[i];
-        w1[i][j] -= 0.1*deltaW1[i][j]; //Update weights
+        w1[i][j] -= 0.3*deltaW1[i][j]; //Update weights
       }
     }
 
     for(int i = 0; i < 3; i++){
-      w2[i] -= 0.1*deltaW2[i]; //Update weights
+      w2[i] -= 0.3*deltaW2[i]; //Update weights
     }
 
     //Print deltaW1 and deltaW2
