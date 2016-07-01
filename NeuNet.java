@@ -1,15 +1,32 @@
+
 public class NeuNet{
 
   //fields
   public double[] input;
   public double[][] w1;
 
+  public double[][] gradientW1;
+
+  public double[][] deltaW1;
+
   public double[] z1;
   public double[] a1;
   public double[] w2;
 
+  public double[] gradientW2;
+
+  public double[] deltaW2;
+
   public double z2;
   public double output;
+  public double output0;
+
+  public double c;
+
+  //COLOR STUFF
+  public static final String green = "\u001B[32m";
+  public static final String blue = "\u001B[34m";
+  public static final String cyan = "\u001B[36m";
 
   /*constructor*/
   public NeuNet(){
@@ -20,6 +37,8 @@ public class NeuNet{
     /*Hidden layer*/
     //initialize weights
     w1 = new double[2][3]; // 2 x 3
+    deltaW1 = new double[2][3]; // 2 x 3
+    gradientW1 = new double[2][3]; // 2 x 3
     //Weights are asignned randomly
     for(int i = 0; i < 2; i++){
       for(int j = 0; j < 2; j++){
@@ -33,13 +52,14 @@ public class NeuNet{
     /*Output layer*/
     //initialize weights
     w2 = new double[3]; // 3 x 1
+    deltaW2 = new double[3]; // 3 x 1
+    gradientW2 = new double[3]; // 3 x 1
     for(int i = 0; i < 3; i++){
       w2[i] = Math.random();
     }
     z2 = 0;
     output = 0;
   }
-
 
   /*Methods*/
   //return the estimated value
@@ -69,9 +89,113 @@ public class NeuNet{
     return output;
   }
 
+  public void back(){
+
+    double alpha = -(output0 - output)*sPrime(z2);
+
+    //d cost / d w2
+    for(int i = 0; i < 3; i++){
+      deltaW2[i] = alpha*a1[i];
+    }
+
+    //d cost / d w2
+    for(int i = 0; i < 2; i++){
+      for(int j = 0; j < 3; j++){
+        deltaW1[i][j] = alpha*sPrime(z1[j])*w2[j]*input[i];
+        w1[i][j] -= 0.1*deltaW1[i][j]; //Update weights
+      }
+    }
+
+    for(int i = 0; i < 3; i++){
+      w2[i] -= 0.1*deltaW2[i]; //Update weights
+    }
+
+    //Print deltaW1 and deltaW2
+    System.out.println(blue + "------------- deltaW1 -------------");
+    for(int i=0; i < 2; i++){
+      for(int j=0; j < 3; j++){
+        System.out.print(blue + deltaW1[i][j] + " ");
+      }
+      System.out.println();
+    }
+
+    System.out.println(cyan + "------------- deltaW2 -------------");
+    for(int i = 0; i<3; i++){
+      System.out.println(cyan + deltaW2[i]);
+    }
+    System.out.println(blue +"----------------------------");
+
+  }
+
+  public void test(double[] input){
+    double e = Math.pow(10,-4);
+
+    //W1
+    for(int i = 0; i < 3; i++){
+      for(int j = 0; j < 2; j++){
+        gradientW1[j][i] = ( input[j]* (w1[j][i] + e) - input[j]* (w1[j][i] - e) ) / (2*e);
+      }
+    }
+
+    System.out.println("------------- gradientW1 -------------");
+    for(int i=0; i < 2; i++){
+      for(int j=0; j < 3; j++){
+        System.out.print(gradientW1[i][j] + " ");
+      }
+      System.out.println();
+    }
+
+    //w2
+    for(int i = 0; i < 3; i++){
+      gradientW2[i] = (a1[i]*(w2[i] + e ) - a1[i]* (w2[i]-e))/ (2*e);
+    }
+
+    System.out.println("------------- gradientW2 -------------");
+    for(int i = 0; i<3; i++){
+        System.out.println(gradientW2[i]);
+    }
+    System.out.println("---------------------------- -------");
+
+  }
+
+
+  public void norm(){
+    System.out.println("---------------NORMALIZE -------");
+    double temp = 0;;
+    for(int i=0; i < 2; i++){
+      for(int j=0; j < 3; j++){
+        temp += gradientW1[i][j] + deltaW1[i][j];
+        System.out.print(temp + ", ");
+      }
+      System.out.println();
+    }
+
+    System.out.println("----");
+
+    for(int i=0; i < 2; i++){
+      for(int j=0; j < 3; j++){
+        temp += gradientW1[i][j] - deltaW1[i][j];
+        System.out.print(temp + ", ");
+      }
+      System.out.println();
+    }
+
+  }
+
   //activation function || Sigmoid function
   public static double s(double x){
     return (1/(1 + Math.exp(-x)));
+  }
+
+  public static double sPrime(double x){
+    return (Math.exp(-x) / ( Math.pow( (1 + Math.exp(-x)), 2 ) ) );
+  }
+
+  //cost function cost = 1/2 ( realOutput - output(Guess) )^2
+  public double cost(double realOutput){
+    output0 = realOutput;
+    c = 0.5*Math.pow( (realOutput - output), 2 );
+    return c;
   }
 
 }
