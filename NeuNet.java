@@ -4,11 +4,15 @@ public class NeuNet{
   public double[] input;
   public double[][] w1;
 
+  public double[][] gradientW1;
+
   public double[][] deltaW1;
 
   public double[] z1;
   public double[] a1;
   public double[] w2;
+
+  public double[] gradientW2;
 
   public double[] deltaW2;
 
@@ -28,6 +32,7 @@ public class NeuNet{
     //initialize weights
     w1 = new double[2][3]; // 2 x 3
     deltaW1 = new double[2][3]; // 2 x 3
+    gradientW1 = new double[2][3]; // 2 x 3
     //Weights are asignned randomly
     for(int i = 0; i < 2; i++){
       for(int j = 0; j < 2; j++){
@@ -42,6 +47,7 @@ public class NeuNet{
     //initialize weights
     w2 = new double[3]; // 3 x 1
     deltaW2 = new double[3]; // 3 x 1
+    gradientW2 = new double[3]; // 3 x 1
     for(int i = 0; i < 3; i++){
       w2[i] = Math.random();
     }
@@ -96,6 +102,76 @@ public class NeuNet{
 
     for(int i = 0; i < 3; i++){
       w2[i] -= deltaW2[i]; //Update weights
+    }
+
+    //Print deltaW1 and deltaW2
+    System.out.println("------------- deltaW1 -------------");
+    for(int i=0; i < 2; i++){
+      for(int j=0; j < 3; j++){
+        System.out.print(deltaW1[i][j] + " ");
+      }
+      System.out.println();
+    }
+
+    System.out.println("------------- deltaW2 -------------");
+    for(int i = 0; i<3; i++){
+      System.out.println(deltaW2[i]);
+    }
+    System.out.println("----------------------------");
+
+  }
+
+  public void test(double[] input){
+    double e = Math.pow(10,-4);
+
+    //W1
+    for(int i = 0; i < 3; i++){
+      for(int j = 0; j < 2; j++){
+        gradientW1[j][i] = ( input[j]* (w1[j][i] + e) - input[j]* (w1[j][i] - e) ) / (2*e);
+      }
+    }
+
+    System.out.println("------------- gradientW1 -------------");
+    for(int i=0; i < 2; i++){
+      for(int j=0; j < 3; j++){
+        System.out.print(gradientW1[i][j] + " ");
+      }
+      System.out.println();
+    }
+
+    //w2
+    for(int i = 0; i < 3; i++){
+      gradientW2[i] = (a1[i]*(w2[i] + e ) - a1[i]* (w2[i]-e))/ (2*e);
+    }
+
+    System.out.println("------------- gradientW2 -------------");
+    for(int i = 0; i<3; i++){
+        System.out.println(gradientW2[i]);
+    }
+    System.out.println("---------------------------- -------");
+
+  }
+
+
+  public void norm(){
+    System.out.println("---------------NORMALIZE -------");
+    double temp = 0;;
+    for(int i=0; i < 2; i++){
+      for(int j=0; j < 3; j++){
+        temp += gradientW1[i][j] + deltaW1[i][j];
+        System.out.print(temp + ", ");
+      }
+      System.out.println();
+    }
+
+    System.out.println("----");
+
+    for(int i=0; i < 2; i++){
+      for(int j=0; j < 3; j++){
+        temp += gradientW1[i][j] - deltaW1[i][j];
+        System.out.print(temp + ", ");
+      }
+      System.out.println();
     }
 
   }

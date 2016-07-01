@@ -10,14 +10,21 @@ public class main{
     System.out.println("Test Neural Network");
     NeuNet nn = new NeuNet();
 
-    double[] a = new double[]{0.5, 0.7};
+    double[] a = new double[]{0.3, 0.2};
 
-    for(int i = 0; i < 10; i++){
-      a[0] = 0.5*Math.random();
-      a[1] = 0.5*Math.random();
+    //Estimation
+    nn.forward(a);
+    nn.test(a);
+    nn.back();
+    nn.norm();
+    /*
+    for(int i = 0; i < 10000; i++){
+      a[0] = 0.3;
+      a[1] = 0.2;
       nn.forward(a);
-      System.out.println(nn.cost(f(a)));
+      System.out.println(nn.cost(f(a)) + ", ");
       nn.back();
     }
+    */
   }
 }
