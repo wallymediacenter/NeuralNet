@@ -1,201 +1,149 @@
 
 public class NeuNet{
 
-  //fields
-  public double[] input;
-  public double[][] w1;
+  /*Fields*/
 
-  public double[][] gradientW1;
+  //Input layer
+  public static double[][] s; //1x5
 
-  public double[][] deltaW1;
+  //W1
+  public static double[][] w1; //5x6
 
-  public double[] z1;
-  public double[] a1;
-  public double[] w2;
+  //Hidden layer 1
+  public static double[][] z1; //1x6
+  public static double[][] a1; //1x6
 
-  public double[] gradientW2;
+  //W2
+  public static double[][] w2; //6x5
 
-  public double[] deltaW2;
+  //Hidden layer 2
+  public static double[][] z2; //1x5
+  public static double[][] a2; //1x5
 
-  public double z2;
-  public double output;
-  public double output0;
+  //W3
+  public static double[][] w3; //5x3
 
-  public double c;
+  //Output layer
+  public static double[][] z3; //1x3
+  public static double[][] q; //1x3
 
-  //COLOR STUFF
-  public static final String green = "\u001B[32m";
-  public static final String blue = "\u001B[34m";
-  public static final String cyan = "\u001B[36m";
 
-  /*constructor*/
+  /*Constructor*/
   public NeuNet(){
+    //Input layer
+    s = new double[1][5];
 
-    /*Input player*/
-    input = new double[2]; // 1 x 2
+    //W1
+    w1 = new double[5][6];
+    random(w1);
 
-    /*Hidden layer*/
-    //initialize weights
-    w1 = new double[2][3]; // 2 x 3
-    deltaW1 = new double[2][3]; // 2 x 3
-    gradientW1 = new double[2][3]; // 2 x 3
-    //Weights are asignned randomly
-    for(int i = 0; i < 2; i++){
-      for(int j = 0; j < 2; j++){
-        w1[i][j] = 0.5*Math.random();
-      }
-    }
+    //Hidden layer 1
+    z1 = new double[1][6];
+    a1 = new double[1][6];
 
-    z1 = new double[3]; // 1 x 3
-    a1 = new double[3]; // 1 x 3
+    //W2
+    w2 = new double[6][5];
+    random(w2);
 
-    /*Output layer*/
-    //initialize weights
-    w2 = new double[3]; // 3 x 1
-    deltaW2 = new double[3]; // 3 x 1
-    gradientW2 = new double[3]; // 3 x 1
-    for(int i = 0; i < 3; i++){
-      w2[i] = 0.5*Math.random();
-    }
-    z2 = 0;
-    output = 0;
+    //Hidden layer 2
+    z2 = new double[1][5];
+    a2 = new double[1][5];
+
+    //W2
+    w3 = new double[5][3];
+    random(w3);
+
+    //Output layer
+    z3 = new double[1][3];
+    q = new double[1][3];
   }
 
   /*Methods*/
-  //return the estimated value
-  public double forward(double[] newInput){
 
-    input = newInput;
-
-    /*First layer -> Hiden layer*/
-    //matrix multiplication z1(1x3) = input(1x2) * w1(2x3)
-    for(int i = 0; i < 3; i++){
-      for(int j = 0; j < 2; j++){
-        z1[i] += input[j]*w1[j][i];
+  //*Basic matrix operation*//
+  //Matrix multiplication
+  public static double[][] mul(double[][] a, double[][] b){
+    //i ~ row, j ~ column
+    double[][] c = new double[a.length][b[0].length];
+    for(int i = 0; i<c.length; i++){
+      for(int j = 0; j<c[0].length; j++){
+        for(int k = 0; k< c[0].length; k++){
+          c[i][j] += a[i][k]*b[k][j];
+        }
       }
     }
 
-    //Activate z1
-    for(int i = 0; i < 3; i++){
-      a1[i] = s(z1[i]);
-    }
-
-    /*Hidden layer -> Output*/
-    for(int i = 0; i< 3; i++){
-      z2+=a1[i]*w2[i];
-    }
-    //Activate z2
-    output = s(z2);
-    return output;
-  }
-
-  public void back(){
-
-    double alpha = -(output0 - output)*sPrime(z2);
-
-    //d cost / d w2
-    for(int i = 0; i < 3; i++){
-      deltaW2[i] = alpha*a1[i];
-    }
-
-    //d cost / d w2
-    for(int i = 0; i < 2; i++){
-      for(int j = 0; j < 3; j++){
-        deltaW1[i][j] = alpha*sPrime(z1[j])*w2[j]*input[i];
-        w1[i][j] -= 0.3*deltaW1[i][j]; //Update weights
-      }
-    }
-
-    for(int i = 0; i < 3; i++){
-      w2[i] -= 0.3*deltaW2[i]; //Update weights
-    }
-
-    //Print deltaW1 and deltaW2
-    System.out.println(blue + "------------- deltaW1 -------------");
-    for(int i=0; i < 2; i++){
-      for(int j=0; j < 3; j++){
-        System.out.print(blue + deltaW1[i][j] + " ");
-      }
-      System.out.println();
-    }
-
-    System.out.println(cyan + "------------- deltaW2 -------------");
-    for(int i = 0; i<3; i++){
-      System.out.println(cyan + deltaW2[i]);
-    }
-    System.out.println(blue +"----------------------------");
-
-  }
-
-  public void test(double[] input){
-    double e = Math.pow(10,-4);
-
-    //W1
-    for(int i = 0; i < 3; i++){
-      for(int j = 0; j < 2; j++){
-        gradientW1[j][i] = ( input[j]* (w1[j][i] + e) - input[j]* (w1[j][i] - e) ) / (2*e);
-      }
-    }
-
-    System.out.println("------------- gradientW1 -------------");
-    for(int i=0; i < 2; i++){
-      for(int j=0; j < 3; j++){
-        System.out.print(gradientW1[i][j] + " ");
-      }
-      System.out.println();
-    }
-
-    //w2
-    for(int i = 0; i < 3; i++){
-      gradientW2[i] = (a1[i]*(w2[i] + e ) - a1[i]* (w2[i]-e))/ (2*e);
-    }
-
-    System.out.println("------------- gradientW2 -------------");
-    for(int i = 0; i<3; i++){
-        System.out.println(gradientW2[i]);
-    }
-    System.out.println("---------------------------- -------");
-
-  }
-
-
-  public void norm(){
-    System.out.println("---------------NORMALIZE -------");
-    double temp = 0;;
-    for(int i=0; i < 2; i++){
-      for(int j=0; j < 3; j++){
-        temp += gradientW1[i][j] + deltaW1[i][j];
-        System.out.print(temp + ", ");
-      }
-      System.out.println();
-    }
-
-    System.out.println("----");
-
-    for(int i=0; i < 2; i++){
-      for(int j=0; j < 3; j++){
-        temp += gradientW1[i][j] - deltaW1[i][j];
-        System.out.print(temp + ", ");
-      }
-      System.out.println();
-    }
-
-  }
-
-  //activation function || Sigmoid function
-  public static double s(double x){
-    return (1/(1 + Math.exp(-x)));
-  }
-
-  public static double sPrime(double x){
-    return (Math.exp(-x) / ( Math.pow( (1 + Math.exp(-x)), 2 ) ) );
-  }
-
-  //cost function cost = 1/2 ( realOutput - output(Guess) )^2
-  public double cost(double realOutput){
-    output0 = realOutput;
-    c = 0.5*Math.pow( (realOutput - output), 2 );
     return c;
   }
 
+  //Print matrix
+  public static void printMat(double[][] c){
+    for(int i = 0; i<c.length; i++){
+      for(int j = 0; j<c[0].length; j++){
+        System.out.print(c[i][j] + "  ");
+      }
+      System.out.println();
+    }
+  }
+
+
+  //Randomize weight
+  public static void random(double[][] w){
+    for(int i = 0; i < w.length; i++){
+      for(int j = 0; j < w[0].length; j++){
+        w[i][j] = Math.random();
+      }
+    }
+  }
+
+  //*Learning aid*//
+  //Sigmoid function
+  public static double s(double x){
+    return (1 / ( 1 + Math.exp(-x) ));
+  }
+
+  //Overload
+  public static double[][] s(double[][] w){
+    double[][] a = new double[w.length][w[0].length];
+    for(int i = 0; i < a.length; i++){
+      for(int j = 0; j < a[0].length; j++){
+        a[i][j] =  1 / ( 1 + Math.exp( -w[i][j] ) );
+      }
+    }
+    return a;
+  }
+
+  public static double sPrime(double x){
+    return ( (Math.exp(-x)) / (Math.pow( (1+Math.exp(-x)), 2 )) );
+  }
+
+  //Overload
+  public static double[][] sPrime(double[][] w){
+    double[][] a = new double[w.length][w[0].length];
+    for(int i = 0; i < a.length; i++){
+      for(int j = 0; j < a[0].length; j++){
+        a[i][j] =  ( (Math.exp(-w[i][j])) / (Math.pow( (1+Math.exp(-w[i][j])), 2 )) );
+      }
+    }
+    return a;
+  }
+
+  /////////////////////////**///////////////////////////////
+  public static void forward(){
+
+
+    //Hidden layer 1
+    z1 = mul(s, w1);
+    a1 = s(z1);
+
+    //Hidden layer 2
+    z2 = mul(a1, w2);
+    a2 = s(z2);
+
+    //Output
+    z3 = mul(a2, w3);
+    q = s(z3);
+
+
+  }
 }
