@@ -3,14 +3,27 @@ public class main{
     NeuNet nn = new NeuNet();
 
 
-    nn.forward();
+    double[][] s = new double[1][5];
+    s[0][0]=1;
+    s[0][1]=2;
+    s[0][2]=3;
+    s[0][2]=3;
+    s[0][2]=3;
 
-    double[][] qTarget = new double[1][3];
-    qTarget[0][0]=1;
-    qTarget[0][1]=2;
-    qTarget[0][2]=3;
+    nn.forward(s);
+
+
 
     nn.back(0.5);
+
+    int a = 10;
+    int b;
+
+    b = a;
+
+    b++;
+
+    System.out.println(b + "--" + a);
 
   }
 }

@@ -122,7 +122,8 @@ public class NeuNet{
     return c;
   }
   //Print matrix
-  public static void printMat(double[][] c){
+  public static void printMat(double[][] c, String abc){
+    System.out.println(abc);
     System.out.println("-------");
     for(int i = 0; i<c.length; i++){
       for(int j = 0; j<c[0].length; j++){
@@ -155,9 +156,13 @@ public class NeuNet{
   }
 
   public double[][] max(double[][] q, double r, double gamma){
-    double[][] newQ;
-    newQ = q;
+    double[][] newQ = new double[q.length][q[0].length];
 
+    for(int i = 0; i < q.length; i++){
+      for(int j = 0; j < q[0].length; j++){
+        newQ[i][j] = q[i][j];
+      }
+    }
     int max = 0;
 
     if(q.length > 1){System.out.println("Error this function ony accept single row matrix");}
@@ -166,8 +171,7 @@ public class NeuNet{
       if(q[0][max] < q[0][2]) max = 2;
     }
 
-    newQ[0][max] = r + gamma*newQ[0][max];
-
+    newQ[0][max] = r + gamma.newQ[0][max];
     return newQ;
   }
 
@@ -204,7 +208,10 @@ public class NeuNet{
   }
 
   /////////////////////////**///////////////////////////////
-  public void forward(){
+  public void forward(double[][] sensorInput){
+
+    s = sensorInput;
+
     //Hidden layer 1
     z1 = mul(s, w1);
     a1 = s(z1);
@@ -217,22 +224,15 @@ public class NeuNet{
     z3 = mul(a2, w3);
     q = s(z3);
 
+    qTarget = max(q, r, 0.9);
   }
 
   public void back(double r){
 
     double[][] qTarget;
 
-    System.out.println("q, r = 10, gamma = 0.5");
-    printMat(q);
+    //max(q, r, gamma)
 
-    qTarget = max(q, 10, r);
-
-    System.out.println("qTarget");
-    printMat(qTarget);
-
-    System.out.println("Loss function");
-    printMat(q);
 
     double[][] sigma4;
     double[][] sigma3;
@@ -247,8 +247,6 @@ public class NeuNet{
 
     //Update oldQ;
     oldQ = q;
-
-
 
     //Update W
     w1 = subtract(w1, sMul(0.5, deltaW1));
