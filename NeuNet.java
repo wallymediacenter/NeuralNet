@@ -29,10 +29,8 @@ public class NeuNet{
   //Output layer
   public double[][] z3; //1x3
   public double[][] q; //1x3
-  public double oldQ;
+  public double[][] oldQ;
 
-  //Error
-  public double[] error;
 
 
   /*Constructor*/
@@ -72,10 +70,8 @@ public class NeuNet{
     //Output layer
     z3 = new double[1][3];
     q = new double[1][3];
-    oldQ = 0.0;
+    oldQ = new double[1][3];
 
-    //Error
-    error = new double[3];
   }
 
   /*Methods*/
@@ -105,6 +101,17 @@ public class NeuNet{
     return c;
   }
 
+
+  public static double[][] sMul(double c, double[][] a){ //Scalar product
+    double[][] b = new double[a.length][a[0].length];
+    for(int i = 0; i< a.length; i++){
+      for(int j = 0; j < a[0].length; j++){
+        b[i][j] = c*a[i][j];
+      }
+    }
+    return b;
+  }
+
   public static double[][] subtract(double[][] a, double[][] b){
     double[][] c = new double[a.length][a[0].length];
     for(int i = 0; i< a.length; i++){
@@ -116,12 +123,15 @@ public class NeuNet{
   }
   //Print matrix
   public static void printMat(double[][] c){
+    System.out.println("-------");
     for(int i = 0; i<c.length; i++){
       for(int j = 0; j<c[0].length; j++){
         System.out.print(c[i][j] + "  ");
       }
       System.out.println();
     }
+    System.out.println("-------");
+    System.out.println();
   }
 
 
@@ -144,14 +154,21 @@ public class NeuNet{
     return t;
   }
 
-  public int max(double[][] q){
-    int max = 100;
+  public double[][] max(double[][] q, double r, double gamma){
+    double[][] newQ;
+    newQ = q;
+
+    int max = 0;
+
     if(q.length > 1){System.out.println("Error this function ony accept single row matrix");}
     else{
       if(q[0][0] > q[0][1]) max = 0; else max = 1;
       if(q[0][max] < q[0][2]) max = 2;
     }
-    return max;
+
+    newQ[0][max] = r + gamma*newQ[0][max];
+
+    return newQ;
   }
 
   //*Learning aid*//
@@ -199,22 +216,43 @@ public class NeuNet{
     //Output
     z3 = mul(a2, w3);
     q = s(z3);
+
   }
 
-  public void back(double[][] qTarget){
+  public void back(double r){
+
+    double[][] qTarget;
+
+    System.out.println("q, r = 10, gamma = 0.5");
+    printMat(q);
+
+    qTarget = max(q, 10, r);
+
+    System.out.println("qTarget");
+    printMat(qTarget);
+
+    System.out.println("Loss function");
+    printMat(q);
+
     double[][] sigma4;
     double[][] sigma3;
     double[][] sigma2;
 
-    printMat(transpose(a2));
-    System.out.println();
-    sigma4 = hMul(subtract(q, qTarget), sPrime(z3));
-
-    printMat(sigma4);
-
+    sigma4 = hMul(subtract(qTarget, oldQ), sPrime(z3));
     deltaW3 = mul( transpose(a2), sigma4 );
+    sigma3 = hMul( mul(sigma4, transpose(w3)), sPrime(z2));
+    deltaW2 = mul(transpose(a1), sigma3);
+    sigma2 = hMul( mul(sigma3, transpose(w2)), sPrime(z1) );
+    deltaW1 = mul(transpose(s), sigma2);
+
+    //Update oldQ;
+    oldQ = q;
 
 
 
+    //Update W
+    w1 = subtract(w1, sMul(0.5, deltaW1));
+    w2 = subtract(w2, sMul(0.5, deltaW2));
+    w3 = subtract(w3, sMul(0.5, deltaW3));
   }
 }

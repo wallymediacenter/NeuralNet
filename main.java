@@ -2,6 +2,7 @@ public class main{
   public static void main(String[] args){
     NeuNet nn = new NeuNet();
 
+
     nn.forward();
 
     double[][] qTarget = new double[1][3];
@@ -9,6 +10,7 @@ public class main{
     qTarget[0][1]=2;
     qTarget[0][2]=3;
 
-    nn.back(qTarget);
+    nn.back(0.5);
+
   }
 }
