@@ -85,9 +85,9 @@ public class NeuNet{
   public static double[][] mul(double[][] a, double[][] b){
     //i ~ row, j ~ column
     double[][] c = new double[a.length][b[0].length];
-    for(int i = 0; i<c.length; i++){
-      for(int j = 0; j<c[0].length; j++){
-        for(int k = 0; k < c.length; k++){
+    for(int i = 0; i < c.length; i++){
+      for(int j = 0; j < c[0].length; j++){
+        for(int k = 0; k < a[0].length; k++){
           c[i][j] += a[i][k]*b[k][j];
         }
       }
@@ -95,14 +95,24 @@ public class NeuNet{
     return c;
   }
 
-  public static double[][] scallarMul(double[][] a, double x){
-    double[][] b = new double[a.length][a[0].length];
+  public static double[][] hMul(double[][] a, double[][] b){ //Hadamard product a.k.a Element wise product. Entry matrix has to have the same dimension
+    double[][] c = new double[a.length][a[0].length];
     for(int i = 0; i< a.length; i++){
       for(int j = 0; j < a[0].length; j++){
-        b[i][j] = a[i][j]*x;
+        c[i][j] = a[i][j]*b[i][j];
       }
     }
-    return b;
+    return c;
+  }
+
+  public static double[][] subtract(double[][] a, double[][] b){
+    double[][] c = new double[a.length][a[0].length];
+    for(int i = 0; i< a.length; i++){
+      for(int j = 0; j < a[0].length; j++){
+        c[i][j] = a[i][j] - b[i][j];
+      }
+    }
+    return c;
   }
   //Print matrix
   public static void printMat(double[][] c){
@@ -125,10 +135,10 @@ public class NeuNet{
   }
 
   public static double[][] transpose(double[][] a){
-    double t[][] = new double[a.length][a[0].length];
+    double t[][] = new double[a[0].length][a.length];
     for(int i = 0; i < a.length; i++){
       for(int j = 0; j < a[0].length; j++){
-        t[i][j] = a[j][i];
+        t[j][i] = a[i][j];
       }
     }
     return t;
@@ -191,7 +201,20 @@ public class NeuNet{
     q = s(z3);
   }
 
-  public void back(){
+  public void back(double[][] qTarget){
+    double[][] sigma4;
+    double[][] sigma3;
+    double[][] sigma2;
+
+    printMat(transpose(a2));
+    System.out.println();
+    sigma4 = hMul(subtract(q, qTarget), sPrime(z3));
+
+    printMat(sigma4);
+
+    deltaW3 = mul( transpose(a2), sigma4 );
+
+
 
   }
 }
